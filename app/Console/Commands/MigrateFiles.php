@@ -53,7 +53,7 @@ class MigrateFiles extends Command
 			->table('files')
 			->get();
 
-		$transferring = 0;
+		//$transferring = 0;
 
 		$progress = $this->getOutput()->createProgressBar(count($files));
 		$progress->start();
@@ -61,15 +61,15 @@ class MigrateFiles extends Command
 		foreach ($files as $file) {
 			TransferFile::dispatch($file);
 
-			$transferring++;
+			//$transferring++;
 
 			$progress->advance();
 
-			if ($transferring > 10) {
-				$progress->finish();
-				break;
-			}
+			// if ($transferring > 10) {
+			// 	$progress->finish();
+			// 	break;
+			// }
 		}
-
+		$progress->finish();
 	}
 }
