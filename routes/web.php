@@ -19,10 +19,16 @@ use Inertia\Inertia;
 
 Route::get('/', [AppController::class, 'landing'])->name('landing');
 
-Route::get('/files/{file}', [FileController::class, 'view'])->name('files.view');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
+
 	Route::get('/files', [FileController::class, 'list'])->name('files.list');
+	Route::get('/files/favourites', [FileController::class, 'favourites'])->name('files.favourites');
+	Route::delete('/files/{file}', [FileController::class, 'delete'])->name('files.delete');
+	Route::post('/files/{file}/favourite', [FileController::class, 'favourite'])->name('files.favourite');
+	Route::put('/files/{file}/update', [FileController::class, 'update'])->name('files.update');
 
 });
+
+Route::get('/files/{file}', [FileController::class, 'view'])->name('files.view');

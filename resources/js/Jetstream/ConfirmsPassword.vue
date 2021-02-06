@@ -10,7 +10,9 @@
             </template>
 
             <template #content>
-                {{ content }}
+                <div class="text-white">
+	                {{ content }}
+                </div>
 
                 <div class="mt-4">
                     <jet-input type="password" class="mt-1 block w-3/4" placeholder="Password"

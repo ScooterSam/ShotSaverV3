@@ -29,6 +29,8 @@
     },
     "dependencies": {
         "@innologica/vue-dropdown-menu": "^0.1.4",
+        "highlight.js": "^10.5.0",
+        "highlightjs-line-numbers.js": "^2.8.0",
         "moment": "^2.29.1",
         "plyr": "^3.6.4"
     }

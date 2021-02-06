@@ -5,10 +5,12 @@ import Vue                                            from 'vue';
 import { App as InertiaApp, plugin as InertiaPlugin } from '@inertiajs/inertia-vue';
 import PortalVue                                      from 'portal-vue';
 
-
 Vue.mixin({methods : {route}});
 Vue.use(InertiaPlugin);
 Vue.use(PortalVue);
+window.hljs = require('highlight.js');
+import 'highlight.js/styles/atom-one-dark.css'
+require('highlightjs-line-numbers.js');
 
 Vue.filter('from', (e) => {
 	return moment(e).local().fromNow();

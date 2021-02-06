@@ -29,5 +29,8 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+	'digitalocean' => [
+		'spaces_id' => '1d0adacb-bf5c-488e-b38f-1a39ca000852'
+	]
 
 ];

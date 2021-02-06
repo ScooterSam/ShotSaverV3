@@ -3,6 +3,8 @@
 namespace App\Models\Files;
 
 use App\Models\User;
+use Exception;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +16,8 @@ class File extends Model
 	protected $guarded = ['id'];
 
 	protected $casts = [
-		'meta' => 'json',
+		'meta'    => 'json',
+		'private' => 'boolean',
 	];
 
 	public function user()
@@ -56,10 +59,31 @@ class File extends Model
 	/**
 	 * Generate the url for this file.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getUrl(): string
+	public function getThumbUrl(): ?string
 	{
+		if ($this->thumb === null) {
+			return null;
+		}
+
+		$url = Storage::url($this->thumb);
+
+		if ($this->private) {
+			$url = Storage::temporaryUrl($this->thumb, now()->addMinutes(10));
+		}
+
+		return $url;
+	}
+
+	/**
+	 * Generate the url for this file.
+	 *
+	 * @return string|null
+	 */
+	public function getUrl(): ?string
+	{
+
 		$url = Storage::url($this->path);
 
 		if ($this->private) {
@@ -69,4 +93,19 @@ class File extends Model
 		return $url;
 	}
 
+	/**
+	 * Get the code file contents
+	 *
+	 * @return string
+	 * @throws FileNotFoundException
+	 */
+	public function codeFileContents(): string
+	{
+		if ($this->type !== 'code' && $this->type !== 'text') {
+			throw new Exception('This file is not a code file.');
+		}
+
+		return Storage::get($this->path);
+
+	}
 }

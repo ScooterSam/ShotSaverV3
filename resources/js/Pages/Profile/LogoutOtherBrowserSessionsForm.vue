@@ -9,7 +9,7 @@
         </template>
 
         <template #content>
-            <div class="max-w-xl text-sm text-gray-600">
+            <div class="max-w-xl text-sm text-gray-400">
                 If necessary, you may logout of all of your other browser sessions across all of your devices. Some of your recent sessions are listed below; however, this list may not be exhaustive. If you feel your account has been compromised, you should also update your password.
             </div>
 
@@ -27,7 +27,7 @@
                     </div>
 
                     <div class="ml-3">
-                        <div class="text-sm text-gray-600">
+                        <div class="text-sm text-gray-400">
                             {{ session.agent.platform }} - {{ session.agent.browser }}
                         </div>
 
@@ -60,7 +60,9 @@
                 </template>
 
                 <template #content>
-                    Please enter your password to confirm you would like to logout of your other browser sessions across all of your devices.
+                    <div class="text-white">
+	                    Please enter your password to confirm you would like to logout of your other browser sessions across all of your devices.
+                    </div>
 
                     <div class="mt-4">
                         <jet-input type="password" class="mt-1 block w-3/4" placeholder="Password"

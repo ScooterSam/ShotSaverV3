@@ -16,14 +16,25 @@
                             </div>
 
                             <!-- Navigation Links -->
-                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex" v-if="$page.props.user">
                                 <jet-nav-link :href="route('files.list')" :active="route().current('files.list')">
                                     Uploads
+                                </jet-nav-link>
+                                <jet-nav-link :href="route('files.favourites')" :active="route().current('files.favourites')">
+                                    Favourites
+                                </jet-nav-link>
+                            </div>
+                            <div v-else class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex" >
+                                <jet-nav-link :href="route('login')" :active="route().current('login')">
+                                    Login
+                                </jet-nav-link>
+                                <jet-nav-link :href="route('register')" :active="route().current('register')">
+                                    Register
                                 </jet-nav-link>
                             </div>
                         </div>
 
-                        <div class="hidden sm:flex sm:items-center sm:ml-6">
+                        <div class="hidden sm:flex sm:items-center sm:ml-6" v-if="$page.props.user">
 
                             <!-- Settings Dropdown -->
                             <div class="ml-3 relative">
@@ -84,7 +95,7 @@
                 </div>
 
                 <!-- Responsive Navigation Menu -->
-                <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden">
+                <div v-if="$page.props.user" :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden">
                     <div class="pt-2 pb-3 space-y-1">
                         <jet-responsive-nav-link :href="route('files.list')" :active="route().current('files.list')">
                             Uploads
@@ -92,7 +103,7 @@
                     </div>
 
                     <!-- Responsive Settings Options -->
-                    <div class="pt-4 pb-1 border-t border-gray-200">
+                    <div class="pt-4 pb-1 border-t border-gray-200" v-if="$page.props.user">
                         <div class="flex items-center px-4">
                             <div v-if="$page.props.jetstream.managesProfilePhotos" class="flex-shrink-0 mr-3" >
                                 <img class="h-10 w-10 rounded-full object-cover" :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name" />

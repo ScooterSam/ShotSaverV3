@@ -7,8 +7,10 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        <link rel="icon" href="/img/icon.png">
+
         <!-- Fonts -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
+        <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 
         <!-- Styles -->
         <link rel="stylesheet" href="{{ mix('css/app.css') }}">
@@ -19,6 +21,9 @@
         @routes
         <script src="{{ mix('js/app.js') }}" defer></script>
 
+        @if (request()->routeIs('files.view'))
+            @include('metatags', ['file' => $page['props']['file']])
+        @endif
 
     </head>
     <body class="font-sans antialiased">

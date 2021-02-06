@@ -9,9 +9,6 @@ class AppController extends Controller
 {
 	public function landing()
 	{
-		return Inertia::render('Welcome', [
-			'canLogin'       => Route::has('login'),
-			'canRegister'    => Route::has('register'),
-		]);
+		return view('welcome');
 	}
 }

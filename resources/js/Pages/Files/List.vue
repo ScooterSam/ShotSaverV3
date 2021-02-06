@@ -59,8 +59,20 @@
 						<div class="flex flex-row items-center space-x-2">
 
 							<dropdown-menu v-model="showFilterDropdown" class="relative">
-								<button class="bg-blue-500 px-2 py-1 rounded shadow text-white tracking-wide">
-									Filter: <strong>{{ this.filterText() }}</strong> <span class="caret"></span>
+								<button class="bg-blue-500 px-2 py-1 rounded shadow text-white tracking-wide flex flex-row items-center focus:outline-none">
+									Filter: <strong class="pl-1">{{ this.filterText() }}</strong>
+
+									<svg class="ml-1 w-6 h-6 transition transform"
+									     :class="{'rotate-180' : showFilterDropdown}"
+									     fill="none"
+									     stroke="currentColor"
+									     viewBox="0 0 24 24"
+									     xmlns="http://www.w3.org/2000/svg">
+										<path stroke-linecap="round"
+										      stroke-linejoin="round"
+										      stroke-width="2"
+										      d="M19 9l-7 7-7-7"></path>
+									</svg>
 								</button>
 								<div slot="dropdown" class="absolute z-10 bg-gray-900 rounded-b shadow-lg w-full ">
 
@@ -93,10 +105,23 @@
 							</dropdown-menu>
 
 							<dropdown-menu v-model="showDirectionDropdown" class="relative">
-								<button class="bg-blue-500 px-2 py-1 rounded shadow text-white tracking-wide">
+								<button class="bg-blue-500 px-2 py-1 rounded shadow text-white tracking-wide flex flex-row items-center">
 									Order: <strong>{{
 										filters.order === 'desc' ? 'Descending' : 'Ascending'
 									               }}</strong>
+
+
+									<svg class="ml-1 w-6 h-6 transition transform"
+									     :class="{'rotate-180' : showDirectionDropdown}"
+									     fill="none"
+									     stroke="currentColor"
+									     viewBox="0 0 24 24"
+									     xmlns="http://www.w3.org/2000/svg">
+										<path stroke-linecap="round"
+										      stroke-linejoin="round"
+										      stroke-width="2"
+										      d="M19 9l-7 7-7-7"></path>
+									</svg>
 								</button>
 								<div slot="dropdown" class="absolute z-10 bg-gray-900 rounded-b shadow-lg w-full ">
 									<a class="dropdown-item transition hover:bg-gray-800 px-2 py-2 block hover:no-underline hover:text-gray-300 text-white"
@@ -124,9 +149,15 @@
 
 						</div>
 
-						<div v-else class="text-center py-5">
-							<h4>No Uploads</h4>
-							<p>
+						<div v-if="is_favourites && !(files && files.data.length)" class="text-center py-5">
+							<h4 class="text-2xl text-gray-400">No Favourites</h4>
+							<p class="text-gray-300">
+								Favourite some files and they will show here.
+							</p>
+						</div>
+						<div v-if="!is_favourites && !(files && files.data.length)" class="text-center py-5" >
+							<h4 class="text-2xl text-gray-400">No Uploads</h4>
+							<p class="text-gray-300">
 								You have not uploaded any files yet.
 							</p>
 						</div>
@@ -145,7 +176,7 @@ import DropdownMenu from '@innologica/vue-dropdown-menu';
 
 
 export default {
-	props      : ['files'],
+	props      : ['files', 'is_favourites'],
 	name       : "List",
 	components : {
 		FileBlock,
@@ -162,7 +193,7 @@ export default {
 			error      : null,
 			page       : 1,
 
-			showFilterDropdown : false,
+			showFilterDropdown    : false,
 			showDirectionDropdown : false,
 
 			uploadToPreview : null,
