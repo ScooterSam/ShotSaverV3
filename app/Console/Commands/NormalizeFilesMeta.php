@@ -39,7 +39,11 @@ class NormalizeFilesMeta extends Command
 					if (Storage::getVisibility($file->path) === $visibility) {
 						Storage::setVisibility($file->path, $visibility);
 						if ($file->thumb) {
-							Storage::setVisibility($file->thumb, $visibility);
+							if (!Storage::exists($file->thumb) && $file->type == 'image') {
+								$file->thumb = $file->path;
+							} else {
+								Storage::setVisibility($file->thumb, $visibility);
+							}
 						}
 					}
 
