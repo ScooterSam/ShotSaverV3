@@ -17,6 +17,7 @@ class NormalizeFilesMeta extends Command
 	{
 
 		$query = File::query()
+			->where('meta', null)
 			->whereIn('type', ['image', 'video']);
 
 		$progress = $this->getOutput()->createProgressBar($query->count());
@@ -39,6 +40,10 @@ class NormalizeFilesMeta extends Command
 					if (Storage::getVisibility($file->path) === $visibility) {
 						Storage::setVisibility($file->path, $visibility);
 						if ($file->thumb) {
+							if (!Storage::exists($file->thumb) && $file->type == 'video') {
+								$this->line('Image ' . $file->name . ' is fucked.');
+								continue;
+							}
 							if (!Storage::exists($file->thumb) && $file->type == 'image') {
 								$file->thumb = $file->path;
 							} else {
