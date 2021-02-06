@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Files\File;
 use Illuminate\Console\Command;
+use Intervention\Image\Facades\Image;
 
 class NormalizeFilesMeta extends Command
 {
@@ -42,9 +43,25 @@ class NormalizeFilesMeta extends Command
 						}
 					}
 
+
 					if (!$width && !$height) {
-						$progress->advance();
-						continue;
+						if ($file->type === 'image') {
+							$image  = Image::make($file->getUrl());
+							$width  = $image->getWidth();
+							$height = $image->getHeight();
+						}
+						if ($file->type === 'video' && $file->thumb) {
+							$image  = Image::make($file->getThumbUrl());
+							$width  = $image->getWidth();
+							$height = $image->getHeight();
+						}
+
+						if (!$width && !$height) {
+							$this->line('Image '.$file->name.' skipped... cannot get dimensions.');
+
+							$progress->advance();
+							continue;
+						}
 					}
 
 					$file->update([
