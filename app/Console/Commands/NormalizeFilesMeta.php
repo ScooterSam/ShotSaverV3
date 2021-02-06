@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Files\File;
 use Illuminate\Console\Command;
 use Intervention\Image\Facades\Image;
+use Storage;
 
 class NormalizeFilesMeta extends Command
 {
@@ -33,6 +34,16 @@ class NormalizeFilesMeta extends Command
 					$width  = null;
 					$height = null;
 
+					$visibility = $file->private ? 'private' : 'public';
+
+					if (Storage::getVisibility($file->path) === $visibility) {
+						Storage::setVisibility($file->path, $visibility);
+						if ($file->thumb) {
+							Storage::setVisibility($file->thumb, $visibility);
+						}
+					}
+
+
 					if (isset($file->meta['dimensions'])) {
 						if (isset($file->meta['dimensions']['hd'])) {
 							$width  = $file->meta['dimensions']['hd'][0];
@@ -57,7 +68,7 @@ class NormalizeFilesMeta extends Command
 						}
 
 						if (!$width && !$height) {
-							$this->line('Image '.$file->name.' skipped... cannot get dimensions.');
+							$this->line('Image ' . $file->name . ' skipped... cannot get dimensions.');
 
 							$progress->advance();
 							continue;
