@@ -25,8 +25,10 @@
 	<meta property="og:image" content="{{$file->thumb}}" />
 	<meta property="og:image:secure_url" content="{{$file->thumb}}" />
 	<meta property="og:image:type" content="{{$file->mime_type}}" />
-	<meta property="og:image:width" content="{{$file->meta->width}}">
-	<meta property="og:image:height" content="{{$file->meta->height}}">
+	@if($file->meta)
+		<meta property="og:image:width" content="{{$file->meta->width}}">
+		<meta property="og:image:height" content="{{$file->meta->height}}">
+	@endif
 
 	<meta property="og:updated_time" content="{{$file->created_at}}" />
 	<meta property="og:video" content="{{$file->url}}">
