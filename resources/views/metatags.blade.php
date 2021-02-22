@@ -5,8 +5,10 @@
 	<meta property="og:image" content="{{$file->url}}">
 	<meta property="og:image:type" content="{{$file->mime_type}}">
 	<meta property="og:type" content="image">
-	<meta property="og:image:width" content="{{$file->meta->width}}" />
-	<meta property="og:image:height" content="{{$file->meta->height}}" />
+	@if($file->meta)
+		<meta property="og:image:width" content="{{$file->meta->width}}" />
+		<meta property="og:image:height" content="{{$file->meta->height}}" />
+	@endif
 	<meta content="article" property="og:type" />
 @endif
 
@@ -31,13 +33,17 @@
 	<meta property="og:video:url" content="{{$file->url}}">
 	<meta property="og:video:secure_url" content="{{$file->url}}">
 	<meta property="og:video:type" content="{{$file->mime_type}}">
-	<meta property="og:video:width" content="{{$file->meta->width}}">
-	<meta property="og:video:height" content="{{$file->meta->height}}">
+	@if($file->meta)
+		<meta property="og:video:width" content="{{$file->meta->width}}">
+		<meta property="og:video:height" content="{{$file->meta->height}}">
+	@endif
 	<meta name="twitter:card" content="player">
 	<meta name="twitter:site" content="@ShotSaver">
 	<meta name="twitter:image" content="{{$file->thumb}}">
-	<meta name="twitter:player:width" content="{{$file->meta->width}}">
-	<meta name="twitter:player:height" content="{{$file->meta->height}}">
+	@if($file->meta)
+		<meta name="twitter:player:width" content="{{$file->meta->width}}">
+		<meta name="twitter:player:height" content="{{$file->meta->height}}">
+	@endif
 	<meta name="twitter:player:stream" content="{{$file->url}}">
 	<meta name="twitter:player:stream:content_type" content="{{$file->mime_type}}">
 @endif
