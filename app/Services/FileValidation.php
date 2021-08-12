@@ -33,10 +33,8 @@ class FileValidation
 		return "text";
 	}
 
-	public function isCodeFile($extension): array
+	public function isCodeFile($extension): ?array
 	{
-		ray($extension);
-
 		$types = [
 			'ABAP'                => 'abap',
 			'Windows Bat'         => 'bat',
@@ -110,6 +108,8 @@ class FileValidation
 				}
 			}
 		}
+        
+        return null;
 	}
 
 }
