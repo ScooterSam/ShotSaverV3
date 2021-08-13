@@ -19,9 +19,9 @@ class FileUploadController extends Controller
      */
     public function upload(): string
     {
-        $user    = auth()->user();
-        $file    = request()->file('file');
-        $privacy = $user->private_uploads ? 'private' : 'public';
+        $user      = auth()->user();
+        $file      = request()->file('file');
+        $privacy   = $user->private_uploads ? 'private' : 'public';
         $isPrivate = $user->private_uploads;
 
         if (request()->has('privacy')) {
@@ -29,8 +29,8 @@ class FileUploadController extends Controller
                 return "Privacy can only be 'public' or 'private'.";
             }
 
+            $privacy   = request('privacy');
             $isPrivate = $privacy === 'private';
-            $privacy = request('privacy');
         }
 
         if (!$file) {
