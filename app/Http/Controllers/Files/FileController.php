@@ -181,7 +181,9 @@ class FileController extends Controller
 	{
 		$this->authorize('delete', $file);
 
-
+		if (request()->has('name')) {
+			$file->name = request('name');
+		}
 		if (request()->has('description')) {
 			$file->description = request('description');
 		}
