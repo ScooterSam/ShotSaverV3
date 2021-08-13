@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function () {
 
 	Route::post('/upload', [FileUploadController::class, 'upload']);
+	Route::get('/uploads', [FileUploadController::class, 'uploads']);
 
 
 });

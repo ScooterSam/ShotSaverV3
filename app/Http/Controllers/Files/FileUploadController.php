@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Files;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Files\FileResource;
 use App\Jobs\Files\CreateThumbnail;
 use App\Models\Files\File;
 use App\Services\FileValidation;
@@ -75,5 +76,15 @@ class FileUploadController extends Controller
         }
 
         return route('files.view', $fileModel);
+    }
+
+    public function uploads()
+    {
+        $files = auth()->user()->files()
+            ->withCount('views as views')
+            ->orderBy('id', request('order', 'desc'))
+            ->paginate(10);
+
+        return FileResource::collection($files);
     }
 }
