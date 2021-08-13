@@ -13,7 +13,7 @@
 @endif
 
 <meta property="twitter:site" content="@ShotSaver" />
-<meta property="twitter:title" content="ShotSaver" />
+<meta property="twitter:title" content="{{$file->name}}" />
 <meta property="og:site_name" content="ShotSaver" />
 <meta property="twitter:description" content="{{ucfirst($file->type)}} uploaded to ShotSaver by {{$file->user->name}}" />
 <meta property="description" content="{{ucfirst($file->type)}} uploaded to ShotSaver by {{$file->user->name}}"/>
