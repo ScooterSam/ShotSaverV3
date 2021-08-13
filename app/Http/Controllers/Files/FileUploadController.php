@@ -12,58 +12,66 @@ use Illuminate\Support\Str;
 class FileUploadController extends Controller
 {
 
-	/**
-	 * Handle a file being upload from sharex on behalf of a user
-	 *
-	 * @return string
-	 */
-	public function upload(): string
-	{
-		$user = auth()->user();
+    /**
+     * Handle a file being upload from sharex on behalf of a user
+     *
+     * @return string
+     */
+    public function upload(): string
+    {
+        $user    = auth()->user();
+        $file    = request()->file('file');
+        $privacy = $user->private_uploads ? 'private' : 'public';
 
-		$file = request()->file('file');
+        if (request()->has('privacy')) {
+            if (!in_array(request('privacy'), ['public', 'private'])) {
+                return "Privacy can only be 'public' or 'private'.";
+            }
 
-		if (!$file) {
-			return "No file uploaded.";
-		}
+            $privacy = request('privacy');
+        }
 
-		$directory = Str::random();
-		$fileName  = Str::random() . '.' . $file->getClientOriginalExtension();
+        if (!$file) {
+            return "No file uploaded.";
+        }
 
-
-		$path = $file->storeAs($directory, $fileName, 'spaces');
-
-		Storage::setVisibility($path, $user->private_uploads ? 'private' : 'public');
-
-		$type = resolve(FileValidation::class)->fileType($file->getMimeType());
-		$meta = [];
-
-		if ($codeInfo = resolve(FileValidation::class)->isCodeFile($file->getClientOriginalExtension())) {
-			$type = 'code';
-			$meta = $codeInfo;
-		}
-
-		$fileModel = $user->files()->save(new File([
-			'name'          => $file->getClientOriginalName(),
-			'type'          => $type,
-			'path'          => $path,
-			'mime_type'     => $file->getMimeType(),
-			'extension'     => $file->getClientOriginalExtension(),
-			'size_in_bytes' => $file->getSize(),
-			'private'       => $user->private_uploads,
-			'status'        => 'complete',
-			'meta'          => $meta,
-		]));
+        $directory = Str::random();
+        $fileName  = Str::random() . '.' . $file->getClientOriginalExtension();
 
 
-		$folderName = md5($file->getClientOriginalName());
+        $path = $file->storeAs($directory, $fileName, 'spaces');
 
-		$file->storeAs('/temporary/' . $folderName, $fileName, 'local');
+        Storage::setVisibility($path, $privacy);
 
-		if ($type === 'image' || $type === 'video') {
-			CreateThumbnail::dispatch($folderName, $fileModel);
-		}
+        $type = resolve(FileValidation::class)->fileType($file->getMimeType());
+        $meta = [];
 
-		return route('files.view', $fileModel);
-	}
+        if ($codeInfo = resolve(FileValidation::class)->isCodeFile($file->getClientOriginalExtension())) {
+            $type = 'code';
+            $meta = $codeInfo;
+        }
+
+        $fileModel = $user->files()->save(new File([
+            'name'          => $file->getClientOriginalName(),
+            'type'          => $type,
+            'path'          => $path,
+            'mime_type'     => $file->getMimeType(),
+            'extension'     => $file->getClientOriginalExtension(),
+            'size_in_bytes' => $file->getSize(),
+            'private'       => $user->private_uploads,
+            'status'        => 'complete',
+            'meta'          => $meta,
+        ]));
+
+
+        $folderName = md5($file->getClientOriginalName());
+
+        $file->storeAs('/temporary/' . $folderName, $fileName, 'local');
+
+        if ($type === 'image' || $type === 'video') {
+            CreateThumbnail::dispatch($folderName, $fileModel);
+        }
+
+        return route('files.view', $fileModel);
+    }
 }
