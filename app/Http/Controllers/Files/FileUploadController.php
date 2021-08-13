@@ -22,12 +22,14 @@ class FileUploadController extends Controller
         $user    = auth()->user();
         $file    = request()->file('file');
         $privacy = $user->private_uploads ? 'private' : 'public';
+        $isPrivate = $user->private_uploads;
 
         if (request()->has('privacy')) {
             if (!in_array(request('privacy'), ['public', 'private'])) {
                 return "Privacy can only be 'public' or 'private'.";
             }
 
+            $isPrivate = $privacy === 'private';
             $privacy = request('privacy');
         }
 
@@ -58,7 +60,7 @@ class FileUploadController extends Controller
             'mime_type'     => $file->getMimeType(),
             'extension'     => $file->getClientOriginalExtension(),
             'size_in_bytes' => $file->getSize(),
-            'private'       => $user->private_uploads,
+            'private'       => $isPrivate,
             'status'        => 'complete',
             'meta'          => $meta,
         ]));
