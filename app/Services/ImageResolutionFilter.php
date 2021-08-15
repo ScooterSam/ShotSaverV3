@@ -41,19 +41,22 @@ class ImageResolutionFilter implements FrameFilterInterface
     public function apply(Frame $frame)
     {
         $dimensions = null;
-        $commands = array();
+        $commands   = [];
 
-	    /**
-	     * @var Stream $stream
-	     */
+        /**
+         * @var Stream $stream
+         */
         foreach ($frame->getVideo()->getStreams() as $stream) {
             if ($stream->isVideo()) {
                 try {
-                  //  $dimensions = $stream->getDimensions();
-	                $dimensions = new Dimension(640, 360);
+                    $dimensions = $stream->getDimensions();
+                    // $dimensions = new Dimension(640, 360);
+
+                    $width  = number_format($dimensions->getWidth() / 3, 0);
+                    $height = number_format($dimensions->getHeight() / 3, 0);
 
                     $commands[] = '-s';
-                    $commands[] = $dimensions->getWidth() . 'x' . $dimensions->getHeight();
+                    $commands[] = $width . 'x' . $height;
                     break;
                 } catch (RuntimeException $e) {
 

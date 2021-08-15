@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Files\File;
-use App\Services\FileValidation;
+use App\Services\FileUpload\FileValidation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Queue\SerializesModels;

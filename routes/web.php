@@ -19,6 +19,7 @@ use Inertia\Inertia;
 
 Route::get('/', [AppController::class, 'landing'])->name('landing');
 
+Route::get('sso/{token}', [AppController::class, 'sso'])->name('sso');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 

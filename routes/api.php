@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\FileController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Files\FileUploadController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Jetstream\Http\Controllers\Inertia\CurrentUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,10 +18,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->name('api.')->group(function () {
 
-	Route::post('/upload', [FileUploadController::class, 'upload']);
-	Route::get('/uploads', [FileUploadController::class, 'uploads']);
+    Route::get('/user', [UserController::class, 'current'])->name('user.current');
 
+    Route::post('/upload', [FileUploadController::class, 'upload']);
+
+    Route::get('files', [FileController::class, 'list']);
+    Route::get('files/favourites', [FileController::class, 'favourites']);
+    Route::get('files/{file}', [FileController::class, 'file']);
 
 });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Files;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Files\FileResource;
 use App\Models\Files\File;
+use App\Services\FilesService;
 use DigitalOceanV2\HttpClient\Util\JsonObject;
 use GrahamCampbell\DigitalOcean\DigitalOceanManager;
 use GrahamCampbell\DigitalOcean\Facades\DigitalOcean;
@@ -17,197 +18,203 @@ use Storage;
 
 class FileController extends Controller
 {
-	/**
-	 * @param false $favourites
-	 *
-	 * @return JsonResponse|Response
-	 */
-	private function filesList(bool $favourites)
-	{
-		$user = auth()->user();
+    /**
+     * Show a filterable list of the users files
+     *
+     * @return Response
+     */
+    public function list(): Response
+    {
+        return FilesService::forUser(auth()->user())->inertiaFiles();
+    }
 
-		if (request()->has('order_by')) {
-			if (!in_array(request('order_by'), ['created', 'size', 'type', 'views', 'favourites'])) {
-				return response()->json(['message' => 'Invalid order...'], 500);
-			}
-		}
-		if (request()->has('order')) {
-			if (!in_array(request('order'), ['desc', 'asc'])) {
-				return response()->json(['message' => 'Invalid order...'], 500);
-			}
-		}
+    /**
+     * Show a filterable list of the users favourite files
+     *
+     * @return Response
+     */
+    public function favourites(): Response
+    {
+        return FilesService::forUser(auth()->user())->inertiaFavourites();
+    }
 
-		$files = $user->files();
+    /**
+     * View an uploaded file
+     *
+     * @param string $file
+     *
+     * @return Response
+     * @throws AuthorizationException
+     */
+    public function view(string $file): Response
+    {
+        $file = File::fileFromUrlKey($file);
 
-		if ($favourites) {
-			$files = $user->favouriteFiles();
-		}
+        if (!$file) {
+            abort(404);
+        }
 
-		$files = $files
-			->withCount('views as views')
-			->withCount('favourites as total_favourites')
-			->withCount([
-				'favourites as favourited' => function ($query) use ($user) {
-					$query->where('user_id', $user->id);
-				},
-			])
-			->when(request()->has('order_by'), function ($query) {
-				$orderBy = request('order_by');
-				$order   = request('order');
+        $this->authorize('view', $file);
 
-				if ($orderBy === 'created') {
-					return $query->orderBy('created_at', $order);
-				}
-				if ($orderBy === 'size') {
-					return $query->orderBy('size_in_bytes', $order);
-				}
-				if ($orderBy === 'type') {
-					return $query->orderBy('type', $order);
-				}
-				if ($orderBy === 'views') {
-					return $query->orderBy('views', $order);
-				}
-				if ($orderBy === 'favourites') {
-					return $query->orderBy('total_favourites', $order);
-				}
-			}, function ($query) {
-				return $query->orderBy('id', request('order', 'desc'));
-			})
-			->paginate(10);
+        $file
+            ->load('user')
+            ->loadCount('views as views')
+            ->loadCount('favourites as total_favourites')
+            ->loadCount([
+                'favourites as favourited' => function ($query) {
+                    $query->where('user_id', auth()->id());
+                },
+            ]);
 
-		return Inertia::render('Files/List', [
-			'files'         => FileResource::collection($files),
-			'is_favourites' => $favourites,
-		]);
-	}
+        $file->saveView();
 
-	/**
-	 * Show a filterable list of the users files
-	 *
-	 * @return JsonResponse|Response
-	 */
-	public function list()
-	{
-		return $this->filesList(false);
-	}
+        return Inertia::render('Files/View', [
+            'file'     => new FileResource($file),
+            'contents' => Inertia::lazy(function () use ($file) {
+                return $file->codeFileContents();
+            }),
+        ]);
+    }
 
-	/**
-	 * Show a filterable list of the users favourite files
-	 *
-	 * @return JsonResponse|Response
-	 */
-	public function favourites()
-	{
-		return $this->filesList(true);
-	}
+    /**
+     * Toggle whether a file is favourited or not
+     *
+     * @param File $file
+     *
+     * @return RedirectResponse
+     * @throws AuthorizationException
+     */
+    public function favourite(File $file): RedirectResponse
+    {
+        $this->authorize('update', $file);
 
-	/**
-	 * View an uploaded file
-	 *
-	 * @param File $file
-	 *
-	 * @return Response
-	 * @throws AuthorizationException
-	 */
-	public function view(File $file): Response
-	{
-		$this->authorize('view', $file);
+        $file->favourite();
 
-		$file
-			->load('user')
-			->loadCount('views as views')
-			->loadCount('favourites as total_favourites')
-			->loadCount([
-				'favourites as favourited' => function ($query) {
-					$query->where('user_id', auth()->id());
-				},
-			]);
+        return back();
+    }
 
-		$file->saveView();
+    /**
+     * Delete an uploaded file
+     *
+     * @param File $file
+     *
+     * @return RedirectResponse
+     * @throws AuthorizationException
+     */
+    public function delete(File $file): RedirectResponse
+    {
+        $this->authorize('delete', $file);
 
-		return Inertia::render('Files/View', [
-			'file'     => new FileResource($file),
-			'contents' => Inertia::lazy(function () use ($file) {
-				return $file->codeFileContents();
-			}),
-		]);
-	}
+        Storage::delete($file->path);
 
-	/**
-	 * Toggle whether a file is favourited or not
-	 *
-	 * @param File $file
-	 *
-	 * @return RedirectResponse
-	 * @throws AuthorizationException
-	 */
-	public function favourite(File $file): RedirectResponse
-	{
-		$this->authorize('update', $file);
+        $file->delete();
 
-		$file->favourite();
+        return back();
+    }
 
-		return back();
-	}
+    /**
+     * Update description/private of an uploaded file
+     *
+     * @param File $file
+     *
+     * @return RedirectResponse
+     * @throws AuthorizationException
+     */
+    public function update(DigitalOceanManager $digitalOcean, File $file): RedirectResponse
+    {
+        $this->authorize('delete', $file);
 
-	/**
-	 * Delete an uploaded file
-	 *
-	 * @param File $file
-	 *
-	 * @return RedirectResponse
-	 * @throws AuthorizationException
-	 */
-	public function delete(File $file): RedirectResponse
-	{
-		$this->authorize('delete', $file);
+        if (request()->has('name')) {
+            $file->name = request('name');
+        }
+        if (request()->has('description')) {
+            $file->description = request('description');
+        }
 
-		Storage::delete($file->path);
+        if (request()->has('private')) {
+            $file->private = request('private');
+        }
 
-		$file->delete();
+        $file->save();
 
-		return back();
-	}
-
-	/**
-	 * Update description/private of an uploaded file
-	 *
-	 * @param File $file
-	 *
-	 * @return RedirectResponse
-	 * @throws AuthorizationException
-	 */
-	public function update(DigitalOceanManager $digitalOcean, File $file): RedirectResponse
-	{
-		$this->authorize('delete', $file);
-
-		if (request()->has('name')) {
-			$file->name = request('name');
-		}
-		if (request()->has('description')) {
-			$file->description = request('description');
-		}
-
-		if (request()->has('private')) {
-			$file->private = request('private');
-		}
-
-		$file->save();
-
-		Storage::setVisibility($file->path, $file->private ? 'private' : 'public');
-		if ($file->thumb) {
-			Storage::setVisibility($file->thumb, $file->private ? 'private' : 'public');
-		}
-		$digitalOcean->getHttpClient()
-			->delete('https://api.digitalocean.com/v2/cdn/endpoints/' . config('services.digitalocean.spaces_id') . '/cache', [
-				'Content-Type' => 'application/json',
-			], JsonObject::encode([
-				'files' => [
-					$file->path,
-				],
-			]));
+        Storage::setVisibility($file->path, $file->private ? 'private' : 'public');
+        if ($file->thumb) {
+            Storage::setVisibility($file->thumb, $file->private ? 'private' : 'public');
+        }
+        $digitalOcean->getHttpClient()
+            ->delete('https://api.digitalocean.com/v2/cdn/endpoints/' . config('services.digitalocean.spaces_id') . '/cache', [
+                'Content-Type' => 'application/json',
+            ], JsonObject::encode([
+                'files' => [
+                    $file->path,
+                ],
+            ]));
 
 
-		return back();
-	}
+        return back();
+    }
+
+    /**
+     * @param false $favourites
+     *
+     * @return JsonResponse|Response
+     */
+    private function filesList(bool $favourites)
+    {
+        $user = auth()->user();
+
+        if (request()->has('order_by')) {
+            if (!in_array(request('order_by'), ['created', 'size', 'type', 'views', 'favourites'])) {
+                return response()->json(['message' => 'Invalid order...'], 500);
+            }
+        }
+        if (request()->has('order')) {
+            if (!in_array(request('order'), ['desc', 'asc'])) {
+                return response()->json(['message' => 'Invalid order...'], 500);
+            }
+        }
+
+        $files = $user->files();
+
+        if ($favourites) {
+            $files = $user->favouriteFiles();
+        }
+
+        $files = $files
+            ->withCount('views as views')
+            ->withCount('favourites as total_favourites')
+            ->withCount([
+                'favourites as favourited' => function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                },
+            ])
+            ->when(request()->has('order_by'), function ($query) {
+                $orderBy = request('order_by');
+                $order   = request('order');
+
+                if ($orderBy === 'created') {
+                    return $query->orderBy('created_at', $order);
+                }
+                if ($orderBy === 'size') {
+                    return $query->orderBy('size_in_bytes', $order);
+                }
+                if ($orderBy === 'type') {
+                    return $query->orderBy('type', $order);
+                }
+                if ($orderBy === 'views') {
+                    return $query->orderBy('views', $order);
+                }
+                if ($orderBy === 'favourites') {
+                    return $query->orderBy('total_favourites', $order);
+                }
+            }, function ($query) {
+                return $query->orderBy('id', request('order', 'desc'));
+            })
+            ->paginate(10);
+
+        return Inertia::render('Files/List', [
+            'files'         => FileResource::collection($files),
+            'is_favourites' => $favourites,
+        ]);
+    }
 }
