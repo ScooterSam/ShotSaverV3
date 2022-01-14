@@ -1,0 +1,18 @@
+{
+    "Version": "13.4.0",
+    "Name": "Shotsaver.io",
+    "DestinationType": "ImageUploader, TextUploader, FileUploader",
+    "RequestMethod": "POST",
+    "RequestURL": "https://shotsaver.io/api/upload",
+    "Headers": {
+        "Authorization": "Bearer ",
+        "Accept": "application/json"
+    },
+    "Body": "MultipartFormData",
+    "Arguments": {
+        "privacy": "public"
+    },
+    "FileFormName": "file",
+    "URL": "$json:urls.id$",
+    "ThumbnailURL": "$json:url$"
+}

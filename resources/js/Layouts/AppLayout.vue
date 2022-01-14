@@ -16,40 +16,47 @@
                             </div>
 
                             <!-- Navigation Links -->
-                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex" v-if="$page.props.user">
-                                <jet-nav-link :href="route('files.list')" :active="route().current('files.list')">
+                            <div v-if="$page.props.user" class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                                <jet-nav-link :active="route().current('files.list')" :href="route('files.list')">
                                     Uploads
                                 </jet-nav-link>
-                                <jet-nav-link :href="route('files.favourites')" :active="route().current('files.favourites')">
+                                <jet-nav-link :active="route().current('files.favourites')" :href="route('files.favourites')">
                                     Favourites
                                 </jet-nav-link>
+                                <jet-nav-link :active="route().current('setup')" :href="route('setup')">
+                                    Setup
+                                </jet-nav-link>
                             </div>
-                            <div v-else class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex" >
-                                <jet-nav-link :href="route('login')" :active="route().current('login')">
+                            <div v-else class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                                <jet-nav-link :active="route().current('login')" :href="route('login')">
                                     Login
                                 </jet-nav-link>
-                                <jet-nav-link :href="route('register')" :active="route().current('register')">
+                                <jet-nav-link :active="route().current('register')" :href="route('register')">
                                     Register
                                 </jet-nav-link>
                             </div>
                         </div>
 
-                        <div class="hidden sm:flex sm:items-center sm:ml-6" v-if="$page.props.user">
+                        <div v-if="$page.props.user" class="hidden sm:flex sm:items-center sm:ml-6">
 
                             <!-- Settings Dropdown -->
                             <div class="ml-3 relative">
                                 <jet-dropdown align="right" width="48">
                                     <template #trigger>
-                                        <button v-if="$page.props.jetstream.managesProfilePhotos" class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
-                                            <img class="h-8 w-8 rounded-full object-cover" :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name" />
+                                        <button v-if="$page.props.jetstream.managesProfilePhotos"
+                                                class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
+                                            <img :alt="$page.props.user.name" :src="$page.props.user.profile_photo_url" class="h-8 w-8 rounded-full object-cover" />
                                         </button>
 
                                         <span v-else class="inline-flex rounded-md">
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-300 bg-gray-800 hover:text-gray-100 focus:outline-none transition ease-in-out duration-150">
+                                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-300 bg-gray-800 hover:text-gray-100 focus:outline-none transition ease-in-out duration-150"
+                                                    type="button">
                                                 {{ $page.props.user.name }}
 
-                                                <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                <svg class="ml-2 -mr-0.5 h-4 w-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                    <path clip-rule="evenodd"
+                                                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                          fill-rule="evenodd" />
                                                 </svg>
                                             </button>
                                         </span>
@@ -65,7 +72,7 @@
                                             Profile
                                         </jet-dropdown-link>
 
-                                        <jet-dropdown-link :href="route('api-tokens.index')" v-if="$page.props.jetstream.hasApiFeatures">
+                                        <jet-dropdown-link v-if="$page.props.jetstream.hasApiFeatures" :href="route('api-tokens.index')">
                                             API Tokens
                                         </jet-dropdown-link>
 
@@ -84,10 +91,19 @@
 
                         <!-- Hamburger -->
                         <div class="-mr-2 flex items-center sm:hidden">
-                            <button @click="showingNavigationDropdown = ! showingNavigationDropdown" class="inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-gray-300 hover:bg-gray-800 focus:outline-none focus:bg-gray-800 focus:text-gray-300 transition duration-150 ease-in-out">
-                                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path :class="{'hidden': showingNavigationDropdown, 'inline-flex': ! showingNavigationDropdown }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                    <path :class="{'hidden': ! showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            <button class="inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-gray-300 hover:bg-gray-800 focus:outline-none focus:bg-gray-800 focus:text-gray-300 transition duration-150 ease-in-out"
+                                    @click="showingNavigationDropdown = ! showingNavigationDropdown">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path :class="{'hidden': showingNavigationDropdown, 'inline-flex': ! showingNavigationDropdown }"
+                                          d="M4 6h16M4 12h16M4 18h16"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          stroke-width="2" />
+                                    <path :class="{'hidden': ! showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
+                                          d="M6 18L18 6M6 6l12 12"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          stroke-width="2" />
                                 </svg>
                             </button>
                         </div>
@@ -97,16 +113,16 @@
                 <!-- Responsive Navigation Menu -->
                 <div v-if="$page.props.user" :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden">
                     <div class="pt-2 pb-3 space-y-1">
-                        <jet-responsive-nav-link :href="route('files.list')" :active="route().current('files.list')">
+                        <jet-responsive-nav-link :active="route().current('files.list')" :href="route('files.list')">
                             Uploads
                         </jet-responsive-nav-link>
                     </div>
 
                     <!-- Responsive Settings Options -->
-                    <div class="pt-4 pb-1 border-t border-gray-200" v-if="$page.props.user">
+                    <div v-if="$page.props.user" class="pt-4 pb-1 border-t border-gray-200">
                         <div class="flex items-center px-4">
-                            <div v-if="$page.props.jetstream.managesProfilePhotos" class="flex-shrink-0 mr-3" >
-                                <img class="h-10 w-10 rounded-full object-cover" :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name" />
+                            <div v-if="$page.props.jetstream.managesProfilePhotos" class="flex-shrink-0 mr-3">
+                                <img :alt="$page.props.user.name" :src="$page.props.user.profile_photo_url" class="h-10 w-10 rounded-full object-cover" />
                             </div>
 
                             <div>
@@ -116,11 +132,11 @@
                         </div>
 
                         <div class="mt-3 space-y-1">
-                            <jet-responsive-nav-link :href="route('profile.show')" :active="route().current('profile.show')">
+                            <jet-responsive-nav-link :active="route().current('profile.show')" :href="route('profile.show')">
                                 Profile
                             </jet-responsive-nav-link>
 
-                            <jet-responsive-nav-link :href="route('api-tokens.index')" :active="route().current('api-tokens.index')" v-if="$page.props.jetstream.hasApiFeatures">
+                            <jet-responsive-nav-link v-if="$page.props.jetstream.hasApiFeatures" :active="route().current('api-tokens.index')" :href="route('api-tokens.index')">
                                 API Tokens
                             </jet-responsive-nav-link>
 
@@ -140,11 +156,11 @@
                                 </div>
 
                                 <!-- Team Settings -->
-                                <jet-responsive-nav-link :href="route('teams.show', $page.props.user.current_team)" :active="route().current('teams.show')">
+                                <jet-responsive-nav-link :active="route().current('teams.show')" :href="route('teams.show', $page.props.user.current_team)">
                                     Team Settings
                                 </jet-responsive-nav-link>
 
-                                <jet-responsive-nav-link :href="route('teams.create')" :active="route().current('teams.create')">
+                                <jet-responsive-nav-link :active="route().current('teams.create')" :href="route('teams.create')">
                                     Create New Team
                                 </jet-responsive-nav-link>
 
@@ -156,10 +172,19 @@
                                 </div>
 
                                 <template v-for="team in $page.props.user.all_teams">
-                                    <form @submit.prevent="switchToTeam(team)" :key="team.id">
+                                    <form :key="team.id" @submit.prevent="switchToTeam(team)">
                                         <jet-responsive-nav-link as="button">
                                             <div class="flex items-center">
-                                                <svg v-if="team.id == $page.props.user.current_team_id" class="mr-2 h-5 w-5 text-green-400" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                <svg v-if="team.id == $page.props.user.current_team_id"
+                                                     class="mr-2 h-5 w-5 text-green-400"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-linecap="round"
+                                                     stroke-linejoin="round"
+                                                     stroke-width="2"
+                                                     viewBox="0 0 24 24">
+                                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
                                                 <div>{{ team.name }}</div>
                                             </div>
                                         </jet-responsive-nav-link>
@@ -172,7 +197,7 @@
             </nav>
 
             <!-- Page Heading -->
-            <header class="bg-gray-900 shadow" v-if="$slots.header">
+            <header v-if="$slots.header" class="bg-gray-900 shadow">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <slot name="header"></slot>
                 </div>
@@ -184,48 +209,52 @@
             </main>
 
             <!-- Modal Portal -->
-            <portal-target name="modal" multiple>
+            <portal-target multiple name="modal">
             </portal-target>
         </div>
     </div>
 </template>
 
 <script>
-    import JetApplicationMark from '@/Jetstream/ApplicationMark'
-    import JetBanner from '@/Jetstream/Banner'
-    import JetDropdown from '@/Jetstream/Dropdown'
-    import JetDropdownLink from '@/Jetstream/DropdownLink'
-    import JetNavLink from '@/Jetstream/NavLink'
-    import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink'
+import JetApplicationMark   from '@/Jetstream/ApplicationMark';
+import JetBanner            from '@/Jetstream/Banner';
+import JetDropdown          from '@/Jetstream/Dropdown';
+import JetDropdownLink      from '@/Jetstream/DropdownLink';
+import JetNavLink           from '@/Jetstream/NavLink';
+import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink';
 
-    export default {
-        components: {
-            JetApplicationMark,
-            JetBanner,
-            JetDropdown,
-            JetDropdownLink,
-            JetNavLink,
-            JetResponsiveNavLink,
+
+export default {
+    components : {
+        JetApplicationMark,
+        JetBanner,
+        JetDropdown,
+        JetDropdownLink,
+        JetNavLink,
+        JetResponsiveNavLink,
+    },
+
+    data()
+    {
+        return {
+            showingNavigationDropdown : false,
+        };
+    },
+
+    methods : {
+        switchToTeam(team)
+        {
+            this.$inertia.put(route('current-team.update'), {
+                'team_id' : team.id
+            }, {
+                preserveState : false
+            });
         },
 
-        data() {
-            return {
-                showingNavigationDropdown: false,
-            }
+        logout()
+        {
+            this.$inertia.post(route('logout'));
         },
-
-        methods: {
-            switchToTeam(team) {
-                this.$inertia.put(route('current-team.update'), {
-                    'team_id': team.id
-                }, {
-                    preserveState: false
-                })
-            },
-
-            logout() {
-                this.$inertia.post(route('logout'));
-            },
-        }
     }
+};
 </script>
