@@ -207,7 +207,7 @@ class FileUpload
     public function validationResponse($field, $message, bool $asResponse = false): array|string|JsonResource|JsonResponse
     {
         $json     = ['error' => [$field => $message]];
-        $string   = "$field: $message";
+        $string   = $field.": ".$message;
         $response = $this->isJson
             ? $json
             : $string;
