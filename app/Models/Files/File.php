@@ -109,11 +109,11 @@ class File extends Model
         return Storage::get($this->path);
     }
 
-    public function scopeWithDefaults($query, ?User $user = null)
+    public function loadDefaults(?User $user = null)
     {
         $user = $user ?? auth()->user();
 
-        return $query->load('user')
+        $this->load('user')
             ->loadCount('views as views')
             ->loadCount('favourites as total_favourites')
             ->loadCount([
