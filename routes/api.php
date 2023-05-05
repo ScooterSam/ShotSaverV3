@@ -27,5 +27,6 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::get('files', [FileController::class, 'list']);
     Route::get('files/favourites', [FileController::class, 'favourites']);
     Route::get('files/{file}', [FileController::class, 'file']);
+    Route::patch('files/{file}', [FileController::class, 'update']);
 
 });
