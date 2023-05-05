@@ -22,6 +22,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
 
             'profile_photo_url' => $this->profile_photo_url,
+            'private_uploads' => $this->private_uploads,
 
             'favouriteFiles' => FileResource::collection($this->whenLoaded('favouriteFiles')),
             'files'          => FileResource::collection($this->whenLoaded('files')),
