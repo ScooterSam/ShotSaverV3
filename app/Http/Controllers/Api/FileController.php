@@ -33,7 +33,7 @@ class FileController extends Controller
     {
         $this->authorize('view', $file);
 
-        $file->withDefaults();
+        $file->loadDefaults();
 
         $file->saveView();
 
@@ -45,7 +45,7 @@ class FileController extends Controller
         $this->authorize('update', $file);
 
         $file->update($request->validated());
-        $file->withDefaults();
+        $file->loadDefaults();
 
         return new FileResource($file);
     }
