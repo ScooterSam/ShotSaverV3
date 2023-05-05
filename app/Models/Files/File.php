@@ -107,7 +107,20 @@ class File extends Model
         }
 
         return Storage::get($this->path);
+    }
 
+    public function scopeWithDefaults($query, ?User $user = null)
+    {
+        $user = $user ?? auth()->user();
+
+        return $query->load('user')
+            ->loadCount('views as views')
+            ->loadCount('favourites as total_favourites')
+            ->loadCount([
+                'favourites as favourited' => function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                },
+            ]);
     }
 
     public function urlKey(): string

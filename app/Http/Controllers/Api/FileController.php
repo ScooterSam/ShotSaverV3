@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateFileRequest;
 use App\Http\Resources\Files\FileListResource;
 use App\Http\Resources\Files\FileResource;
 use App\Models\Files\File;
@@ -32,17 +33,19 @@ class FileController extends Controller
     {
         $this->authorize('view', $file);
 
-        $file
-            ->load('user')
-            ->loadCount('views as views')
-            ->loadCount('favourites as total_favourites')
-            ->loadCount([
-                'favourites as favourited' => function ($query) {
-                    $query->where('user_id', auth()->id());
-                },
-            ]);
+        $file->withDefaults();
 
         $file->saveView();
+
+        return new FileResource($file);
+    }
+
+    public function update(UpdateFileRequest $request, File $file)
+    {
+        $this->authorize('update', $file);
+
+        $file->update($request->validated());
+        $file->withDefaults();
 
         return new FileResource($file);
     }
